@@ -8,13 +8,13 @@
 using ODT.PowerPmacComLib;
 using System;
 using System.Threading;
+using System.IO;
 
 namespace CK3E_TEST
 {
     public class ContactCk3e
     {
-        public LogRecord logRecord;
-        private ISyncGpasciiCommunicationInterface[] _communication;
+        private ISyncGpasciiCommunicationInterface _communication;
         private int _deviceNumber;
         private bool _downloading;
         private bool _downloadSuccess;
@@ -44,11 +44,10 @@ namespace CK3E_TEST
             {
                 PMAC.IPAddress = "192.168.0.201";
             }
+            _communication = Connect.CreateSyncGpascii(PMAC.Protocol, null);
         }
 
-        public delegate void LogRecord(string message, string type);
-
-        public ISyncGpasciiCommunicationInterface[] Communication
+        public ISyncGpasciiCommunicationInterface Communication
         {
             get { return _communication; }
             set { _communication = value; }
@@ -82,9 +81,9 @@ namespace CK3E_TEST
             _downloading = false;
 
             string ans = null;
-            _communication[_deviceNumber].GetResponse("A", out ans);
-            _communication[_deviceNumber].GetResponse("close", out ans);
-            _communication[_deviceNumber].GetResponse("delete rotary", out ans);
+            _communication.GetResponse("A", out ans);
+            _communication.GetResponse("close", out ans);
+            _communication.GetResponse("delete rotary", out ans);
         }
 
         /// <summary>
@@ -93,9 +92,9 @@ namespace CK3E_TEST
         public bool Close()
         {
             bool success = false;
-            if (_communication[_deviceNumber].GpAsciiConnected && _openPmacSuccess)
+            if (_communication.GpAsciiConnected && _openPmacSuccess)
             {
-                success = _communication[_deviceNumber].DisconnectGpascii();
+                success = _communication.DisconnectGpascii();
             }
             return success;
         }
@@ -144,12 +143,11 @@ namespace CK3E_TEST
         /// <returns></returns>
         public bool Open()
         {
-            if (!_communication[_deviceNumber].GpAsciiConnected)
+            if (!_communication.GpAsciiConnected)
             {
-                _communication[_deviceNumber] = Connect.CreateSyncGpascii(CommunicationGlobals.ConnectionTypes.SSH, null);
-                _openPmacSuccess = _communication[_deviceNumber].ConnectGpAscii(PMAC.IPAddress, PMAC.PortNumber, PMAC.User, PMAC.Password);
+                //_communication = Connect.CreateSyncGpascii(CommunicationGlobals.ConnectionTypes.SSH, null);
+                _openPmacSuccess = _communication.ConnectGpAscii(PMAC.IPAddress, PMAC.PortNumber, PMAC.User, PMAC.Password);
             }
-
             return _openPmacSuccess;
         }
 
@@ -161,10 +159,10 @@ namespace CK3E_TEST
         public string Send(string cmd)
         {
             string ans = null;
-            if (_communication[_deviceNumber].GpAsciiConnected && _openPmacSuccess)
+            if (_communication.GpAsciiConnected && _openPmacSuccess)
             {
                 string temp = null;
-                Status communicationStatus = _communication[_deviceNumber].GetResponse(cmd, out temp);
+                Status communicationStatus = _communication.GetResponse(cmd, out temp);
                 ans = communicationStatus == Status.Ok ? temp : "\0";
             }
             return ans;
@@ -185,10 +183,7 @@ namespace CK3E_TEST
                 {
                     string pro = _program[_nowLine];
                     _totalLines--;
-                    _communication[_deviceNumber].GetResponse(_program[_nowLine++], out ans);
-
-                    string msg = i.ToString();
-                    logRecord("ROW_" + msg + pro + ans, "DOWNLOAD PROGRAM");
+                    _communication.GetResponse(_program[_nowLine++], out ans);
                 }
             }
             else
@@ -199,10 +194,8 @@ namespace CK3E_TEST
                 {
                     string pro = _program[_nowLine];
                     _totalLines--;
-                    _communication[_deviceNumber].GetResponse(_program[_nowLine++], out ans);
+                    _communication.GetResponse(_program[_nowLine++], out ans);
 
-                    string msg = i.ToString();
-                    logRecord("ROW_" + msg + pro + ans, "DOWNLOAD PROGRAM");
                     i++;
                 }
 
@@ -214,7 +207,7 @@ namespace CK3E_TEST
         /// <summary>
         /// 执行运动控制程序下载
         /// </summary>
-        /// <param name="oNull"></param>
+        /// <param name = "oNull" ></ param >
         private void TdDowning(object oNull)
         {
             _downloadSuccess = false;
@@ -223,7 +216,7 @@ namespace CK3E_TEST
             //下载一次运动控制程序
             _downloading = true;
             DownloadOnce(20);
-            _communication[_deviceNumber].GetResponse("close", out ans);
+            _communication.GetResponse("close", out ans);
             _downloading = false;
             bool checkrotbuffer = true;
             int index = 1;
@@ -231,31 +224,39 @@ namespace CK3E_TEST
             //如果控制程序大于20行，用旋转缓冲区方式下载
             while (!_downloadSuccess)
             {
-                _communication[_deviceNumber].GetResponse("M4000", out ans);
-                int tempint = int.Parse(ans);
+                _communication.GetResponse("M4000", out ans);
+
+                int tempint = int.Parse(ans.Substring(6, ans.Length - 7));
                 if (tempint > 10 * index)
                 {
                     checkrotbuffer = true;
                 }
+
                 if (tempint > 10 * index && checkrotbuffer)
                 {
                     checkrotbuffer = false;
                     index += 2;
-                    //剩余可执行程序小于200行时，下载一次运动控制程序
+                    //剩余可执行程序小于20行时，下载一次运动控制程序
                     _downloading = true;
-                    _communication[_deviceNumber].GetResponse("open rotary", out ans);
+                    _communication.GetResponse("open rotary", out ans);
                     DownloadOnce(20);
-                    _communication[_deviceNumber].GetResponse("close", out ans);
+                    _communication.GetResponse("close", out ans);
                     _downloading = false;
                 }
                 else
                 {
-                    //_communication[_deviceNumber].GetResponse("close", out ans);
+                    //_communication.GetResponse("close", out ans);
                 }
 
                 //两秒检查一次是否需要补充运动控制程序
                 Thread.Sleep(2000);
             }
+        }
+
+        public string[] ReadFile(string path)
+        {
+            string[] temp = File.ReadAllLines(path);
+            return temp;
         }
     }
 }

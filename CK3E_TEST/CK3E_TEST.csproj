@@ -38,9 +38,6 @@
     <Reference Include="ODT.Common">
       <HintPath>..\..\..\..\..\..\..\DeltaTau\PowerPMAC\4\PDK\ODT.Common.dll</HintPath>
     </Reference>
-    <Reference Include="ODT.PMACGlobal">
-      <HintPath>..\..\..\..\..\..\..\DeltaTau\PowerPMAC\4\PDK\ODT.PMACGlobal.dll</HintPath>
-    </Reference>
     <Reference Include="ODT.PowerPmacComLib">
       <HintPath>..\..\..\..\..\..\..\DeltaTau\PowerPMAC\4\PDK\ODT.PowerPmacComLib.dll</HintPath>
     </Reference>
@@ -55,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ALL.cs" />
     <Compile Include="ContactCk3e.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
