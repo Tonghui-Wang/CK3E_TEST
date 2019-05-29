@@ -145,7 +145,7 @@ namespace CK3E_TEST
         {
             if (!_communication.GpAsciiConnected)
             {
-                //_communication = Connect.CreateSyncGpascii(CommunicationGlobals.ConnectionTypes.SSH, null);
+                //_communication = Connect.CreateSyncGpascii(PMAC.Protocol, null);
                 _openPmacSuccess = _communication.ConnectGpAscii(PMAC.IPAddress, PMAC.PortNumber, PMAC.User, PMAC.Password);
             }
             return _openPmacSuccess;
@@ -253,6 +253,11 @@ namespace CK3E_TEST
             }
         }
 
+        /// <summary>
+        /// 读取运动程序文件内容
+        /// </summary>
+        /// <param name="path">文件路径</param>
+        /// <returns>每行运动程序按序转存为字符串数组中的一个元素</returns>
         public string[] ReadFile(string path)
         {
             string[] temp = File.ReadAllLines(path);

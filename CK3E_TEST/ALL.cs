@@ -14,7 +14,7 @@ namespace CK3E_TEST
         public ContactCk3e[] CK3E
         {
             get { return ck3e; }
-            set { ck3e = value; }
+            //set { ck3e = value; }
         }
 
         private static ALL instance;
