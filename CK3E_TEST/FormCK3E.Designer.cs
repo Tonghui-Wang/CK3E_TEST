@@ -1,6 +1,6 @@
 ﻿namespace CK3E_TEST
 {
-    partial class Form1
+    partial class FormCK3E
     {
         /// <summary>
         /// Required designer variable.
@@ -93,7 +93,7 @@
             this.textBox1.Size = new System.Drawing.Size(169, 21);
             this.textBox1.TabIndex = 5;
             // 
-            // Form1
+            // FormCK3E
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -104,7 +104,7 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
-            this.Name = "Form1";
+            this.Name = "FormCK3E";
             this.Text = "Form1";
             this.ResumeLayout(false);
             this.PerformLayout();

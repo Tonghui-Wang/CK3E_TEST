@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CK3E_TEST", "CK3E_TEST\CK3E_TEST.csproj", "{31482562-750A-4FAB-87EC-B0908BAB7098}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService", "WebService\WebService.csproj", "{96385915-38D8-4059-9100-21E20FAE3F42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{31482562-750A-4FAB-87EC-B0908BAB7098}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31482562-750A-4FAB-87EC-B0908BAB7098}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31482562-750A-4FAB-87EC-B0908BAB7098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96385915-38D8-4059-9100-21E20FAE3F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96385915-38D8-4059-9100-21E20FAE3F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96385915-38D8-4059-9100-21E20FAE3F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96385915-38D8-4059-9100-21E20FAE3F42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -10,11 +10,11 @@ using System.Windows.Forms;
 
 namespace CK3E_TEST
 {
-    public partial class Form1 : Form
+    public partial class FormCK3E : Form
     {
         private ALL all;
 
-        public Form1()
+        public FormCK3E()
         {
             InitializeComponent();
             all = ALL.GetInstance();
@@ -59,7 +59,7 @@ namespace CK3E_TEST
         private void button4_Click(object sender, EventArgs e)
         {
             string error = null;
-            string path = System.AppDomain.CurrentDomain.BaseDirectory + @"TH.txt";
+            string path = System.AppDomain.CurrentDomain.BaseDirectory + @"JH.txt";
             string[] program = all.CK3E[0].ReadFile(path);
             //string[] program = {"&3", "A", "M4001=1", "close", "undefine all", "delete all", "delete gather",
             //    "close", "&3", "#1->b", "#2->x", "#3->y", "#4->z", "#5->u", "#6->v", "#7->w", "#8->a",

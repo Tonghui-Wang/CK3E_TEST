@@ -54,18 +54,28 @@
   <ItemGroup>
     <Compile Include="ALL.cs" />
     <Compile Include="ContactCk3e.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="ContactPLC.cs" />
+    <Compile Include="FormCK3E.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="FormCK3E.Designer.cs">
+      <DependentUpon>FormCK3E.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormPLC.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormPLC.Designer.cs">
+      <DependentUpon>FormPLC.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="FormCK3E.resx">
+      <DependentUpon>FormCK3E.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormPLC.resx">
+      <DependentUpon>FormPLC.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

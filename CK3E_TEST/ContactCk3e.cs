@@ -200,7 +200,7 @@ namespace CK3E_TEST
                 }
 
                 //运动控制程序下载完成
-                _downloadSuccess = true;
+                //_downloadSuccess = true;
             }
         }
 
@@ -215,37 +215,37 @@ namespace CK3E_TEST
 
             //下载一次运动控制程序
             _downloading = true;
-            DownloadOnce(20);
+            DownloadOnce(500);
             _communication.GetResponse("close", out ans);
             _downloading = false;
             bool checkrotbuffer = true;
             int index = 1;
 
-            //如果控制程序大于20行，用旋转缓冲区方式下载
+            //如果控制程序大于500行，用旋转缓冲区方式下载
             while (!_downloadSuccess)
             {
-                _communication.GetResponse("M4000", out ans);
+                int tempint = _program.Length;
 
-                int tempint = int.Parse(ans.Substring(6, ans.Length - 7));
-                if (tempint > 10 * index)
+                if (tempint > 250 * index)
                 {
                     checkrotbuffer = true;
                 }
-
-                if (tempint > 10 * index && checkrotbuffer)
+                if (tempint > 250 * index && checkrotbuffer)
                 {
                     checkrotbuffer = false;
                     index += 2;
-                    //剩余可执行程序小于20行时，下载一次运动控制程序
+                    //剩余可执行程序小于500行时，下载一次运动控制程序
                     _downloading = true;
-                    _communication.GetResponse("open rotary", out ans);
-                    DownloadOnce(20);
+                    //_communication.GetResponse("open rotary", out ans);
+                    DownloadOnce(500);
                     _communication.GetResponse("close", out ans);
                     _downloading = false;
                 }
-                else
+                if (tempint < 250 * index)
                 {
-                    //_communication.GetResponse("close", out ans);
+                    DownloadOnce(tempint);
+                    _downloadSuccess = true;
+                    _downloading = false;
                 }
 
                 //两秒检查一次是否需要补充运动控制程序
