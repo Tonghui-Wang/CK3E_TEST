@@ -17,6 +17,7 @@ namespace CK3E_TEST
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new FormCK3E());
+            Application.Run(new FormPLC());
         }
     }
 }

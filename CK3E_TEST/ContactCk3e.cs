@@ -215,8 +215,7 @@ namespace CK3E_TEST
 
             //下载一次运动控制程序
             _downloading = true;
-            DownloadOnce(500);
-            _communication.GetResponse("close", out ans);
+            //DownloadOnce(500);
             _downloading = false;
             bool checkrotbuffer = true;
             int index = 1;
@@ -236,9 +235,10 @@ namespace CK3E_TEST
                     index += 2;
                     //剩余可执行程序小于500行时，下载一次运动控制程序
                     _downloading = true;
-                    //_communication.GetResponse("open rotary", out ans);
+                    _communication.GetResponse("open rotary", out ans);
                     DownloadOnce(500);
                     _communication.GetResponse("close", out ans);
+                    _communication.GetResponse("b0", out ans);
                     _downloading = false;
                 }
                 if (tempint < 250 * index)
