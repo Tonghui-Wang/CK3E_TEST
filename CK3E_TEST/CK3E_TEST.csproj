@@ -35,12 +35,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ODT.Common">
-      <HintPath>..\..\..\..\..\..\..\DeltaTau\PowerPMAC\4\PDK\ODT.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="ODT.PowerPmacComLib">
-      <HintPath>..\..\..\..\..\..\..\DeltaTau\PowerPMAC\4\PDK\ODT.PowerPmacComLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -54,18 +48,11 @@
   <ItemGroup>
     <Compile Include="ALL.cs" />
     <Compile Include="ContactCk3e.cs" />
-    <Compile Include="ContactPLC.cs" />
     <Compile Include="FormCK3E.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="FormCK3E.Designer.cs">
       <DependentUpon>FormCK3E.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FormPLC.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormPLC.Designer.cs">
-      <DependentUpon>FormPLC.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,9 +60,6 @@
   <ItemGroup>
     <EmbeddedResource Include="FormCK3E.resx">
       <DependentUpon>FormCK3E.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormPLC.resx">
-      <DependentUpon>FormPLC.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

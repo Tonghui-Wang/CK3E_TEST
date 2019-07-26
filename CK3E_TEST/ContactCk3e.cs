@@ -5,49 +5,61 @@
 *  (4) 中断运动控制程序执行。
 */
 
-using ODT.PowerPmacComLib;
 using System;
 using System.Threading;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace CK3E_TEST
 {
     public class ContactCk3e
     {
-        private ISyncGpasciiCommunicationInterface _communication;
-        private int _deviceNumber;
+        public LogRecord logRecord;
+        private string Host;
+        private string User;
+        private string Pwd;
+        private string Port;
+
+        private bool _communication;
         private bool _downloading;
         private bool _downloadSuccess;
         private int _totalLines;    //总的程序行数
         private int _nowLine;   //当前下载的程序行序号
         private bool _openPmacSuccess;
         private string[] _program;  //程序
-        private deviceProperties PMAC;
 
-        public ContactCk3e(int deviceNumber)
+        [DllImport("libPowerPMACControl.dll", EntryPoint = "?PowerPMACcontrol_connect@PowerPMACcontrol@PowerPMACcontrol_ns@@QAEHPBD000_N@Z")]
+        public static extern int PowerPMACcontrol_connect([MarshalAs(UnmanagedType.LPStr)]string host,
+            [MarshalAs(UnmanagedType.LPStr)]string user, [MarshalAs(UnmanagedType.LPStr)]string pwd,
+            [MarshalAs(UnmanagedType.LPStr)]string port = "22", bool nominus2 = false);
+
+        [DllImport("libPowerPMACControl.dll", EntryPoint = "?PowerPMACcontrol_isConnected@PowerPMACcontrol@PowerPMACcontrol_ns@@QAE_NH@Z")]
+        public static extern bool PowerPMACcontrol_isConnected(int timeout);
+
+        [DllImport("libPowerPMACControl.dll", EntryPoint = "?PowerPMACcontrol_disconnect@PowerPMACcontrol@PowerPMACcontrol_ns@@QAEHXZ")]
+        public static extern int PowerPMACcontrol_disconnect();
+
+        [DllImport("libPowerPMACControl.dll",
+            EntryPoint = "?PowerPMACcontrol_sendCommand@PowerPMACcontrol@PowerPMACcontrol_ns@@QAEHV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@AAV34@@Z")]
+        public static extern int PowerPMACcontrol_sendCommand(string command, out string reply);
+
+        public ContactCk3e()
         {
-            _deviceNumber = deviceNumber;
             _openPmacSuccess = false;
             _downloadSuccess = true;
             _downloading = false;
 
-            PMAC = new deviceProperties();
-            PMAC.PortNumber = 22;
-            PMAC.User = "root";
-            PMAC.Password = "deltatau";
-            PMAC.Protocol = CommunicationGlobals.ConnectionTypes.SSH;
-            if (_deviceNumber == 0)
-            {
-                PMAC.IPAddress = "192.168.0.200";
-            }
-            else if (_deviceNumber == 1)
-            {
-                PMAC.IPAddress = "192.168.0.201";
-            }
-            _communication = Connect.CreateSyncGpascii(PMAC.Protocol, null);
+            Host = "192.168.0.200";
+            User = "root";
+            Pwd = "deltatau";
+            Port = "22";
+
+            _communication = PowerPMACcontrol_isConnected(5000);
         }
 
-        public ISyncGpasciiCommunicationInterface Communication
+        public delegate void LogRecord(string message, string type);
+
+        public bool Communication
         {
             get { return _communication; }
             set { _communication = value; }
@@ -81,9 +93,9 @@ namespace CK3E_TEST
             _downloading = false;
 
             string ans = null;
-            _communication.GetResponse("A", out ans);
-            _communication.GetResponse("close", out ans);
-            _communication.GetResponse("delete rotary", out ans);
+            PowerPMACcontrol_sendCommand("A", out ans);
+            PowerPMACcontrol_sendCommand("close", out ans);
+            PowerPMACcontrol_sendCommand("delete rotary", out ans);
         }
 
         /// <summary>
@@ -91,12 +103,20 @@ namespace CK3E_TEST
         /// </summary>
         public bool Close()
         {
-            bool success = false;
-            if (_communication.GpAsciiConnected && _openPmacSuccess)
+            int _close = 1;
+            if (_communication && _openPmacSuccess)
             {
-                success = _communication.DisconnectGpascii();
+                _close = PowerPMACcontrol_disconnect();
             }
-            return success;
+
+            if (_close == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -143,10 +163,15 @@ namespace CK3E_TEST
         /// <returns></returns>
         public bool Open()
         {
-            if (!_communication.GpAsciiConnected)
+            int _open = 0;
+            if (!_communication)
             {
-                //_communication = Connect.CreateSyncGpascii(PMAC.Protocol, null);
-                _openPmacSuccess = _communication.ConnectGpAscii(PMAC.IPAddress, PMAC.PortNumber, PMAC.User, PMAC.Password);
+                _open = PowerPMACcontrol_connect(Host, User, Pwd, Port, true);
+            }
+
+            if (_open != 0)
+            {
+                _openPmacSuccess = true;
             }
             return _openPmacSuccess;
         }
@@ -158,14 +183,21 @@ namespace CK3E_TEST
         /// <returns>指令的执行结果</returns>
         public string Send(string cmd)
         {
-            string ans = null;
-            if (_communication.GpAsciiConnected && _openPmacSuccess)
+            int ans = 1;
+            string temp = null;
+            if (_communication && _openPmacSuccess)
             {
-                string temp = null;
-                Status communicationStatus = _communication.GetResponse(cmd, out temp);
-                ans = communicationStatus == Status.Ok ? temp : "\0";
+                ans = PowerPMACcontrol_sendCommand(cmd, out temp);
             }
-            return ans;
+
+            if (ans == 0)
+            {
+                return temp;
+            }
+            else
+            {
+                return "\0";
+            }
         }
 
         /// <summary>
@@ -183,7 +215,10 @@ namespace CK3E_TEST
                 {
                     string pro = _program[_nowLine];
                     _totalLines--;
-                    _communication.GetResponse(_program[_nowLine++], out ans);
+                    PowerPMACcontrol_sendCommand(_program[_nowLine++], out ans);
+
+                    string msg = i.ToString();
+                    logRecord("ROW_" + msg + pro + ans, "DOWNLOAD PROGRAM");
                 }
             }
             else
@@ -194,20 +229,22 @@ namespace CK3E_TEST
                 {
                     string pro = _program[_nowLine];
                     _totalLines--;
-                    _communication.GetResponse(_program[_nowLine++], out ans);
+                    PowerPMACcontrol_sendCommand(_program[_nowLine++], out ans);
 
+                    string msg = i.ToString();
+                    logRecord("ROW_" + msg + pro + ans, "DOWNLOAD PROGRAM");
                     i++;
                 }
 
                 //运动控制程序下载完成
-                //_downloadSuccess = true;
+                _downloadSuccess = true;
             }
         }
 
         /// <summary>
         /// 执行运动控制程序下载
         /// </summary>
-        /// <param name = "oNull" ></ param >
+        /// <param name="oNull"></param>
         private void TdDowning(object oNull)
         {
             _downloadSuccess = false;
@@ -215,7 +252,8 @@ namespace CK3E_TEST
 
             //下载一次运动控制程序
             _downloading = true;
-            //DownloadOnce(500);
+            DownloadOnce(500);
+            PowerPMACcontrol_sendCommand("close", out ans);
             _downloading = false;
             bool checkrotbuffer = true;
             int index = 1;
@@ -223,8 +261,9 @@ namespace CK3E_TEST
             //如果控制程序大于500行，用旋转缓冲区方式下载
             while (!_downloadSuccess)
             {
+                //_communication.GetResponse("M4000", out ans);
+                //int tempint = int.Parse(ans);
                 int tempint = _program.Length;
-
                 if (tempint > 250 * index)
                 {
                     checkrotbuffer = true;
@@ -233,12 +272,11 @@ namespace CK3E_TEST
                 {
                     checkrotbuffer = false;
                     index += 2;
-                    //剩余可执行程序小于500行时，下载一次运动控制程序
+                    //剩余可执行程序小于200行时，下载一次运动控制程序
                     _downloading = true;
-                    _communication.GetResponse("open rotary", out ans);
+                    //_communication.GetResponse("open rotary", out ans);
                     DownloadOnce(500);
-                    _communication.GetResponse("close", out ans);
-                    _communication.GetResponse("b0", out ans);
+                    PowerPMACcontrol_sendCommand("close", out ans);
                     _downloading = false;
                 }
                 if (tempint < 250 * index)
@@ -251,17 +289,6 @@ namespace CK3E_TEST
                 //两秒检查一次是否需要补充运动控制程序
                 Thread.Sleep(2000);
             }
-        }
-
-        /// <summary>
-        /// 读取运动程序文件内容
-        /// </summary>
-        /// <param name="path">文件路径</param>
-        /// <returns>每行运动程序按序转存为字符串数组中的一个元素</returns>
-        public string[] ReadFile(string path)
-        {
-            string[] temp = File.ReadAllLines(path);
-            return temp;
         }
     }
 }

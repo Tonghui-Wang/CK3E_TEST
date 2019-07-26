@@ -8,17 +8,9 @@ namespace CK3E_TEST
 {
     internal class ALL
     {
-        private string comPLC = "COM17";
-        private int numOfCK3E = 2;
-        private ContactPLC plc;
-        private ContactCk3e[] ck3e;
+        private ContactCk3e ck3e;
 
-        public ContactPLC PLC
-        {
-            get { return plc; }
-        }
-
-        public ContactCk3e[] CK3E
+        public ContactCk3e CK3E
         {
             get { return ck3e; }
         }
@@ -28,13 +20,7 @@ namespace CK3E_TEST
 
         private ALL()
         {
-            plc = new ContactPLC(comPLC);
-
-            ck3e = new ContactCk3e[numOfCK3E];
-            for (int i = 0; i < numOfCK3E; i++)
-            {
-                ck3e[i] = new ContactCk3e(i);
-            }
+            ck3e = new ContactCk3e();
         }
 
         public static ALL GetInstance()
